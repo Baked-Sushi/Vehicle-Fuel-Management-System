@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pump Station Ticket System</title>
+    <link rel="stylesheet" href="customer.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Pump Station Ticket System</h1>
+      <div class="user-actions">
+        <span id="currentUsername"></span>
+        <button id="setUsernameBtn">Set Username</button>
+      </div>
+    </header>
+
+    <div class="sidebar">
+      <div class="brand">
+        <h2>Vehicle Fuel</h2>
+        <p>Management System</p>
+      </div>
+
+      <div class="navigation">
+        <button class="nav-link active" data-page="reserve">
+          ⛽ Reserve Fuel
+        </button>
+        <button class="nav-link" data-page="history">
+          📋 Reservation History
+        </button>
+        <button class="nav-link" data-page="settings">⚙️ Settings</button>
+        <button class="nav-link" data-page="complaints">📝 Complain Box</button>
+        <button class="nav-link" data-page="emergency">
+          🚨 Emergency Ticket
+        </button>
+      </div>
+
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </div>
+
+    <div class="main-content">
+      <!-- Reserve Fuel -->
+
+      <section id="reserve" class="page active-page">
+        <h2>Reserve Fuel</h2>
+
+        <form id="reservationForm">
+          <label for="fuelType">Fuel Type</label>
+          <select id="fuelType" required>
+            <option value="">Select Fuel</option>
+            <option>Petrol</option>
+            <option>Octane</option>
+            <option>Diesel</option>
+            <option>CNG</option>
+          </select>
+
+          <label for="quantity">Quantity (Liters)</label>
+          <input
+            type="number"
+            id="quantity"
+            min="1"
+            placeholder="Example: 20"
+            required
+          />
+
+          <label for="pumpStation">Pump Station</label>
+          <select id="pumpStation" required>
+            <option value="">Select Fuel Pump</option>
+            <option>ABC Fuel Station</option>
+            <option>City Fuel Pump</option>
+            <option>Green Road Fuel Station</option>
+          </select>
+
+          <label for="reservationDate">Date</label>
+          <input type="date" id="reservationDate" required />
+
+          <label for="timeSlot">Time Slot</label>
+          <input type="time" id="timeSlot" required />
+
+          <button type="submit">Reserve Slot</button>
+
+          <p id="reservationMessage"></p>
+        </form>
+      </section>
+
+      <!-- Reservation History -->
+
+      <section id="history" class="page">
+        <h2>Reservation History</h2>
+
+        <div id="reservationList">
+          <p>No reservations yet.</p>
+        </div>
+      </section>
+
+      <!-- Settings -->
+
+      <section id="settings" class="page">
+        <h2>Settings</h2>
+
+        <h3>Update Password</h3>
+
+        <form id="passwordForm">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" required />
+
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" minlength="8" required />
+
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" minlength="8" required />
+
+          <button type="submit">Update Password</button>
+
+          <p id="passwordMessage"></p>
+        </form>
+      </section>
+
+      <!-- Complain Box -->
+
+      <section id="complaints" class="page">
+        <h2>Complain Box</h2>
+
+        <form id="complaintForm">
+          <label for="complaintType">Complaint Type</label>
+          <select id="complaintType" required>
+            <option value="">Select Complaint Type</option>
+            <option>Fuel Quality</option>
+            <option>Staff Behaviour</option>
+            <option>Reservation Problem</option>
+            <option>Payment Issue</option>
+            <option>Other</option>
+          </select>
+
+          <label for="complaintDescription">Complaint Description</label>
+          <textarea
+            id="complaintDescription"
+            rows="6"
+            placeholder="Describe your complaint..."
+            required
+          ></textarea>
+
+          <button type="submit">Submit Complaint</button>
+
+          <p id="complaintMessage"></p>
+        </form>
+      </section>
+
+      <!-- Emergency Ticket -->
+
+      <section id="emergency" class="page">
+        <h2>Emergency Ticket</h2>
+
+        <div class="ticket-counter">
+          <h3>Total Emergency Tickets</h3>
+
+          <h1 id="emergencyTicketCount">0</h1>
+        </div>
+
+        <form id="emergencyForm">
+          <label for="emergencyType">Emergency Type</label>
+          <select id="emergencyType" required>
+            <option value="">Select Emergency Type</option>
+            <option>Ambulance</option>
+            <option>Fire Service</option>
+            <option>Police</option>
+            <option>Medical Assistance</option>
+            <option>Other</option>
+          </select>
+
+          <label for="emergencyLocation">Location</label>
+          <input
+            type="text"
+            id="emergencyLocation"
+            placeholder="Enter your location"
+            required
+          />
+
+          <label for="emergencyDescription">Emergency Description</label>
+          <textarea
+            id="emergencyDescription"
+            rows="5"
+            placeholder="Describe the emergency..."
+            required
+          ></textarea>
+
+          <button type="submit">Create Emergency Ticket</button>
+
+          <p id="emergencyMessage"></p>
+        </form>
+
+        <h3>Emergency Ticket History</h3>
+
+        <div id="emergencyTicketList">
+          <p>No emergency tickets yet.</p>
+        </div>
+      </section>
+    </div>
+
+    <footer>© 2026 Vehicle Fuel Management System</footer>
+
+    <script src="customer.js"></script>
+  </body>
+</html>
