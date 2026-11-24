@@ -1,4 +1,4 @@
-/* Login Guard */
+/* Login Guard - Protect admin pages by redirecting unauthenticated users to login */
 
 let loggedInUser = JSON.parse(localStorage.getItem("fuelflowLoggedInUser"));
 
@@ -6,7 +6,7 @@ if (!loggedInUser) {
   window.location.href = "../login/login.html";
 }
 
-/* Page Navigation */
+/* Page Navigation - Handle sidebar button clicks to switch between admin pages */
 
 const navButtons = document.querySelectorAll(".nav-link");
 const pages = document.querySelectorAll(".page");
@@ -27,89 +27,17 @@ navButtons.forEach(function (button) {
   });
 });
 
-/* Auto-set username from login */
+/* Display Username - Show the logged-in admin's name in the top-right corner */
 
 function displayUsername() {
   document.getElementById("currentUsername").textContent = loggedInUser.username
-    ? "Hello, " + loggedInUser.username
+    ? "Welcome, " + loggedInUser.username
     : "";
 }
 
 displayUsername();
 
-/* User Accounts System */
-
-const userForm = document.getElementById("userForm");
-const userFormBtn = document.getElementById("userFormBtn");
-const cancelEditBtn = document.getElementById("cancelEditBtn");
-const searchForm = document.getElementById("searchForm");
-const clearSearchBtn = document.getElementById("clearSearchBtn");
-
-let editingIndex = null;
-
-/* Cancel Edit */
-
-cancelEditBtn.addEventListener("click", function () {
-  editingIndex = null;
-  userForm.reset();
-  userFormBtn.textContent = "Add User";
-  cancelEditBtn.style.display = "none";
-  document.getElementById("userMessage").textContent = "";
-});
-
-/* Search Users */
-
-searchForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  let role = document.getElementById("searchRole").value.trim();
-  let username = document.getElementById("searchUsername").value.trim();
-  let password = document.getElementById("searchPassword").value.trim();
-
-  showUsers(role || null, username || null, password || null);
-});
-
-/* Clear Search */
-
-clearSearchBtn.addEventListener("click", function () {
-  document.getElementById("searchRole").value = "";
-  document.getElementById("searchUsername").value = "";
-  document.getElementById("searchPassword").value = "";
-  document.getElementById("userList").innerHTML = "";
-  document.getElementById("userList").textContent = "Use the search above to find users.";
-});
-
-/* Start Edit */
-
-function startEdit(username) {
-  let users = getUsers();
-  let user = users.find(function (u) {
-    return u.username === username;
-  });
-
-  if (!user) {
-    return;
-  }
-
-  document.getElementById("userUsername").value = user.username;
-  document.getElementById("userPassword").value = user.password;
-  document.getElementById("userRole").value = user.role;
-
-  /* If editing the logged-in admin, disable password field */
-  let loggedInUser = JSON.parse(localStorage.getItem("fuelflowLoggedInUser")) || {};
-  if (loggedInUser.username === user.username && loggedInUser.role === "Admin") {
-    document.getElementById("userPassword").disabled = true;
-    document.getElementById("userPassword").placeholder = "Cannot change via User Accounts (use Settings)";
-  } else {
-    document.getElementById("userPassword").disabled = false;
-    document.getElementById("userPassword").placeholder = "Example: pass123";
-  }
-
-  editingIndex = username;
-  userFormBtn.textContent = "Update User";
-  cancelEditBtn.style.display = "inline-block";
-  document.getElementById("userMessage").textContent = "";
-}
+/* Get Users - Retrieve all registered users from browser localStorage */
 
 function getUsers() {
   try {
@@ -119,11 +47,12 @@ function getUsers() {
   }
 }
 
-function showUsers(filterRole, filterUsername, filterPassword) {
+/* Show Users - Display filtered user cards based on role and/or username search */
+
+function showUsers(filterRole, filterUsername) {
   let users = getUsers();
 
-  /* Apply filters */
-  if (filterRole || filterUsername || filterPassword) {
+  if (filterRole || filterUsername) {
     users = users.filter(function (user) {
       let match = true;
 
@@ -132,10 +61,6 @@ function showUsers(filterRole, filterUsername, filterPassword) {
       }
 
       if (filterUsername && user.username !== filterUsername) {
-        match = false;
-      }
-
-      if (filterPassword && user.password !== filterPassword) {
         match = false;
       }
 
@@ -153,7 +78,7 @@ function showUsers(filterRole, filterUsername, filterPassword) {
     return;
   }
 
-  users.forEach(function (user, index) {
+  users.forEach(function (user) {
     let card = document.createElement("div");
 
     card.className = "user-card";
@@ -178,216 +103,85 @@ function showUsers(filterRole, filterUsername, filterPassword) {
       card.appendChild(p);
     });
 
-    let editBtn = document.createElement("button");
-
-    editBtn.type = "button";
-    editBtn.textContent = "Edit";
-    editBtn.style.marginTop = "10px";
-    editBtn.style.marginLeft = "6px";
-    editBtn.style.background = "#76583e";
-    editBtn.style.color = "#fff";
-    editBtn.style.border = "0";
-    editBtn.style.padding = "6px 12px";
-    editBtn.style.borderRadius = "2px";
-    editBtn.style.cursor = "pointer";
-
-    editBtn.addEventListener("click", function () {
-      startEdit(user.username);
-    });
-
-    card.appendChild(editBtn);
-
-    /* Only show Remove button for non-admin users */
-    if (user.role !== "Admin") {
-      let removeBtn = document.createElement("button");
-
-      removeBtn.type = "button";
-      removeBtn.textContent = "Remove";
-      removeBtn.style.marginTop = "10px";
-      removeBtn.style.background = "#a94442";
-      removeBtn.style.color = "#fff";
-      removeBtn.style.border = "0";
-      removeBtn.style.padding = "6px 12px";
-      removeBtn.style.borderRadius = "2px";
-      removeBtn.style.cursor = "pointer";
-
-      removeBtn.addEventListener("click", function () {
-        removeUser(user.username);
-      });
-
-      card.appendChild(removeBtn);
-    }
-
     list.appendChild(card);
   });
 }
 
-/* Remove User */
+/* Search Users - Filter and display users when admin submits the search form */
 
-function removeUser(username) {
-  let users = getUsers();
-  let targetUser = users.find(function (u) {
-    return u.username === username;
-  });
+const searchForm = document.getElementById("searchForm");
 
-  let loggedInUser = JSON.parse(localStorage.getItem("fuelflowLoggedInUser")) || {};
-
-  /* Prevent removing another admin */
-  if (targetUser && targetUser.role === "Admin" && loggedInUser.role === "Admin") {
-    alert("You cannot remove another admin user.");
-    return;
-  }
-
-  let confirmRemove = confirm("Are you sure you want to remove this user?");
-
-  if (confirmRemove) {
-    let editIndex = users.findIndex(function (u) {
-      return u.username === username;
-    });
-
-    if (editIndex !== -1) {
-      users.splice(editIndex, 1);
-    }
-
-    localStorage.setItem("fuelflowUsers", JSON.stringify(users));
-
-    showUsers();
-  }
-}
-
-/* Add User */
-
-userForm.addEventListener("submit", function (event) {
+searchForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
-  let user = {
-    username: document.getElementById("userUsername").value,
-    password: document.getElementById("userPassword").value,
-    role: document.getElementById("userRole").value,
-  };
+  let role = document.getElementById("searchRole").value.trim();
+  let username = document.getElementById("searchUsername").value.trim();
 
-  let users = getUsers();
-
-  if (editingIndex !== null) {
-    let editIndex = users.findIndex(function (u) {
-      return u.username === editingIndex;
-    });
-
-    if (editIndex !== -1) {
-      users[editIndex] = user;
-    }
-
-    document.getElementById("userMessage").textContent =
-      "User updated successfully!";
-
-    editingIndex = null;
-    userFormBtn.textContent = "Add User";
-    cancelEditBtn.style.display = "none";
-  } else {
-    users.push(user);
-
-    document.getElementById("userMessage").textContent =
-      "User added successfully!";
-  }
-
-  localStorage.setItem("fuelflowUsers", JSON.stringify(users));
-
-  userForm.reset();
-
-  showUsers();
+  showUsers(role || null, username || null);
 });
 
-/* Fuel Types & Prices System */
+/* Add User Form - Create a new user account with username, password, and role */
 
-const fuelForm = document.getElementById("fuelForm");
+const addUserForm = document.getElementById("addUserForm");
+const addUserMessage = document.getElementById("addUserMessage");
 
-function getFuels() {
+addUserForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  let addUsername = document.getElementById("addUsername").value.trim();
+  let addPassword = document.getElementById("addPassword").value;
+  let addRole = document.getElementById("addRole").value;
+
+  addUserMessage.textContent = "";
+
+  let users = [];
+
   try {
-    return JSON.parse(localStorage.getItem("fuelflowAdminFuels")) || [];
+    users = JSON.parse(localStorage.getItem("fuelflowUsers")) || [];
   } catch (e) {
-    return [];
-  }
-}
-
-function showFuels() {
-  let fuels = getFuels();
-
-  let list = document.getElementById("fuelList");
-
-  list.innerHTML = "";
-
-  if (fuels.length === 0) {
-    list.textContent = "No fuel types defined yet.";
-
+    console.error("Error reading users:", e);
+    addUserMessage.textContent = "System error. Please try again.";
+    addUserMessage.style.color = "#a94442";
     return;
   }
 
-  fuels.forEach(function (fuel) {
-    let card = document.createElement("div");
-
-    card.className = "fuel-card";
-
-    let heading = document.createElement("h3");
-
-    heading.textContent = fuel.name;
-
-    card.appendChild(heading);
-
-    let details = [
-      ["Price Per Liter", fuel.price + " BDT"],
-    ];
-
-    details.forEach(function (item) {
-      let p = document.createElement("p");
-
-      let strong = document.createElement("strong");
-
-      strong.textContent = item[0] + ": ";
-
-      p.appendChild(strong);
-
-      p.appendChild(document.createTextNode(item[1]));
-
-      card.appendChild(p);
-    });
-
-    list.appendChild(card);
-  });
-}
-
-/* Add / Update Fuel */
-
-fuelForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  let fuelItem = {
-    name: document.getElementById("fuelName").value,
-    price: document.getElementById("fuelPrice").value,
-  };
-
-  let fuels = getFuels();
-
-  let existingIndex = fuels.findIndex(function (fuel) {
-    return fuel.name === fuelItem.name;
-  });
-
-  if (existingIndex !== -1) {
-    fuels[existingIndex] = fuelItem;
-  } else {
-    fuels.push(fuelItem);
+  if (!Array.isArray(users)) {
+    users = [];
   }
 
-  localStorage.setItem("fuelflowAdminFuels", JSON.stringify(fuels));
+  /* Check if username already exists to prevent duplicates */
+  let userExists = users.find(function (u) {
+    return u.username === addUsername;
+  });
 
-  document.getElementById("fuelMessage").textContent =
-    "Fuel type added / updated successfully!";
+  if (userExists) {
+    addUserMessage.textContent = "Username already exists.";
+    addUserMessage.style.color = "#a94442";
+    return;
+  }
 
-  fuelForm.reset();
+  let newUser = {
+    name: addUsername,
+    username: addUsername,
+    password: addPassword,
+    role: addRole,
+  };
 
-  showFuels();
+  users.push(newUser);
+
+  try {
+    localStorage.setItem("fuelflowUsers", JSON.stringify(users));
+    addUserMessage.textContent = "User has been added.";
+    addUserMessage.style.color = "#47734b";
+    addUserForm.reset();
+  } catch (e) {
+    console.error("Error saving user:", e);
+    addUserMessage.textContent = "System error. Please try again.";
+    addUserMessage.style.color = "#a94442";
+  }
 });
 
-/* Transactions System (reads from staff sales) */
+/* Get Staff Sales - Retrieve all fuel sale transactions from staff module */
 
 function getStaffSales() {
   try {
@@ -396,6 +190,8 @@ function getStaffSales() {
     return [];
   }
 }
+
+/* Show Transactions - Display all staff sales as transaction cards with totals */
 
 function showTransactions() {
   let sales = getStaffSales();
@@ -460,186 +256,19 @@ function showTransactions() {
   });
 }
 
-/* Station Information System */
-
-const stationForm = document.getElementById("stationForm");
-
-function getStation() {
-  try {
-    return JSON.parse(localStorage.getItem("fuelflowAdminStation")) || null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function showStation() {
-  let station = getStation();
-
-  let details = document.getElementById("stationDetails");
-
-  if (!station) {
-    details.textContent = "No station information saved yet.";
-
-    return;
-  }
-
-  details.innerHTML = "";
-
-  let card = document.createElement("div");
-  card.className = "station-card";
-
-  let heading = document.createElement("h3");
-  heading.textContent = station.name;
-  card.appendChild(heading);
-
-  let info = [
-    ["Address", station.address],
-    ["Contact", station.contact],
-  ];
-
-  info.forEach(function (item) {
-    let p = document.createElement("p");
-
-    let strong = document.createElement("strong");
-    strong.textContent = item[0] + ": ";
-
-    p.appendChild(strong);
-    p.appendChild(document.createTextNode(item[1]));
-
-    card.appendChild(p);
-  });
-
-  details.appendChild(card);
-}
-
-stationForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  let station = {
-    name: document.getElementById("stationName").value,
-    address: document.getElementById("stationAddress").value,
-    contact: document.getElementById("stationContact").value,
-  };
-
-  localStorage.setItem("fuelflowAdminStation", JSON.stringify(station));
-
-  document.getElementById("stationMessage").textContent =
-    "Station information saved successfully!";
-
-  stationForm.reset();
-
-  showStation();
-});
-
-/* System Overview */
-
-function showSystemOverview() {
-  let users = getUsers();
-  let fuels = getFuels();
-  let sales = getStaffSales();
-
-  let totalRevenue = 0;
-
-  sales.forEach(function (sale) {
-    totalRevenue += parseFloat(sale.total);
-  });
-
-  document.getElementById("sysUsers").textContent = users.length;
-  document.getElementById("sysFuelTypes").textContent = fuels.length;
-  document.getElementById("sysTransactions").textContent = sales.length;
-  document.getElementById("sysRevenue").textContent =
-    totalRevenue.toFixed(2);
-
-  let activity = document.getElementById("systemActivity");
-
-  activity.innerHTML = "";
-
-  if (users.length === 0 && fuels.length === 0 && sales.length === 0) {
-    activity.textContent = "No activity data available.";
-
-    return;
-  }
-
-  if (users.length > 0) {
-    let p = document.createElement("p");
-    p.textContent = "Registered Users: " + users.length;
-    activity.appendChild(p);
-  }
-
-  if (fuels.length > 0) {
-    let p = document.createElement("p");
-    p.textContent = "Fuel Types Defined: " + fuels.length;
-    activity.appendChild(p);
-  }
-
-  if (sales.length > 0) {
-    let p = document.createElement("p");
-    p.textContent = "Total Transactions Monitored: " + sales.length;
-    activity.appendChild(p);
-  }
-
-  if (totalRevenue > 0) {
-    let p = document.createElement("p");
-    p.textContent = "Total Revenue: " + totalRevenue.toFixed(2) + " BDT";
-    activity.appendChild(p);
-  }
-}
-
-/* Dashboard */
+/* Dashboard - Display admin dashboard with user count, transaction count, and transaction list */
 
 function showDashboard() {
   let users = getUsers();
-  let fuels = getFuels();
   let sales = getStaffSales();
 
   document.getElementById("totalUsers").textContent = users.length;
-  document.getElementById("totalFuelTypes").textContent = fuels.length;
   document.getElementById("totalTransactions").textContent = sales.length;
 
-  showFuels();
   showTransactions();
-  showStation();
-  showSystemOverview();
 }
 
-/* Update Password */
-
-const passwordForm = document.getElementById("passwordForm");
-
-passwordForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  let currentPassword = document.getElementById("currentPassword").value;
-
-  let newPassword = document.getElementById("newPassword").value;
-
-  let confirmPassword = document.getElementById("confirmPassword").value;
-
-  let message = document.getElementById("passwordMessage");
-
-  if (newPassword.length < 8) {
-    message.textContent = "Password must contain at least 8 characters.";
-  } else if (newPassword !== confirmPassword) {
-    message.textContent = "New passwords do not match.";
-  } else if (newPassword === currentPassword) {
-    message.textContent =
-      "New password must be different from current password.";
-  } else {
-    message.textContent = "Password form validated successfully.";
-
-    passwordForm.reset();
-  }
-});
-
-/* Initialize */
-
-try {
-  showDashboard();
-} catch (e) {
-  console.error("Dashboard load error:", e);
-}
-
-/* Logout */
+/* Logout - Clear admin session and redirect back to login page */
 
 document.getElementById("logoutBtn").addEventListener("click", function () {
   let confirmLogout = confirm("Are you sure you want to logout?");
@@ -650,3 +279,7 @@ document.getElementById("logoutBtn").addEventListener("click", function () {
     window.location.href = "../login/login.html";
   }
 });
+
+/* Initialize - Load dashboard content when admin page first loads */
+
+showDashboard();

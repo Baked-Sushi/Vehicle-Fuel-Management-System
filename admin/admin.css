@@ -1,3 +1,7 @@
+/* =========================================
+   GLOBAL STYLES - Basic page and text setup
+   ========================================= */
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -5,6 +9,10 @@ body {
   color: #39332e;
   line-height: 1.45;
 }
+
+/* =========================================
+   HEADER STYLES - Top navigation bar
+   ========================================= */
 
 header {
   background: #faf7f1;
@@ -30,7 +38,10 @@ header h1 {
   margin-right: 8px;
 }
 
-/* sidebar */
+/* =========================================
+   SIDEBAR STYLES - Left navigation panel
+   ========================================= */
+
 .sidebar {
   float: left;
   width: 228px;
@@ -38,18 +49,6 @@ header h1 {
   padding: 16px 18px;
   box-sizing: border-box;
   background: #e9dfd1;
-}
-
-.brand {
-  text-align: center;
-  border-bottom: 1px solid #cdbda8;
-  padding-bottom: 14px;
-}
-
-.brand h2 {
-  color: #624833;
-  font-size: 20px;
-  font-weight: 600;
 }
 
 .navigation button {
@@ -86,7 +85,10 @@ header h1 {
   background: #8a3634;
 }
 
-/* main */
+/* =========================================
+   MAIN CONTENT STYLES - Right content area
+   ========================================= */
+
 .main-content {
   margin-left: 228px;
   padding: 24px 28px;
@@ -175,12 +177,12 @@ button[type="button"]:hover {
   background: #5b422f;
 }
 
-/* cards */
-.admin-card,
+/* =========================================
+   CARD STYLES - User and transaction cards
+   ========================================= */
+
 .user-card,
-.fuel-card,
-.transaction-card,
-.station-card {
+.transaction-card {
   margin: 14px 0;
   padding: 14px 16px;
   background: #f8f4ed;
@@ -189,16 +191,10 @@ button[type="button"]:hover {
   border-radius: 2px;
 }
 
-.admin-card h3,
-.user-card h3,
-.fuel-card h3,
-.transaction-card h3,
-.station-card h3 {
-  color: #604630;
-  margin-top: 0;
-}
+/* =========================================
+   COUNTER STYLES - Dashboard stat boxes
+   ========================================= */
 
-/* counter */
 .ticket-counter {
   width: 216px;
   padding: 11px;
@@ -216,19 +212,42 @@ button[type="button"]:hover {
   margin: 4px 0;
 }
 
-/* status messages */
+/* =========================================
+   STATUS MESSAGE STYLES - Form feedback
+   ========================================= */
+
 #userMessage,
-#fuelMessage,
 #transactionMessage,
-#stationMessage,
-#reportMessage,
-#passwordMessage {
+#passwordMessage,
+#addUserMessage {
   color: #47734b;
   font-size: 13.5px;
 }
 
 .empty-message {
   color: #766b60;
+}
+
+/* =========================================
+   ADD USER SECTION STYLES - User creation form
+   ========================================= */
+
+.add-user-section {
+  margin-top: 20px;
+  padding: 16px;
+  border-top: 1px solid #cdbda8;
+}
+
+.add-user-section h3 {
+  color: #604630;
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.add-user-section p {
+  margin-top: 10px;
+  font-size: 12.5px;
+  text-align: center;
 }
 
 footer {
@@ -241,7 +260,10 @@ footer {
   font-size: 12.5px;
 }
 
-/* small screens */
+/* =========================================
+   RESPONSIVE STYLES - Mobile device support
+   ========================================= */
+
 @media (max-width: 700px) {
   .sidebar {
     float: none;
